@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:googleplay="http://www.google.com/schemas/play-podcasts/1.0"
+     xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+<channel>
+        <title>{{ podcast.title }}</title>
+        <description>{{ podcast.description }}</description>
+        <itunes:image href="{{ request.scheme }}://{{ request.META.HTTP_HOST }}{{ podcast.itunes_image.url }}"/>
+        <language>{{ podcast.language }}</language>
+        <itunes:category text="{{ podcast.itunes_category }}">
+            {% if podcast.subcategory %}
+            <itunes:category text="{{ podcast.subcategory }}"/>
+            {% endif %}
+        </itunes:category>
+        <itunes:explicit>{% if podcast.itunes_explicit %}yes{% else %}no{% endif %}</itunes:explicit>
+
+        <itunes:author>{{ podcast.itunes_author }}</itunes:author>
+        <link>{{ podcast.link }}</link>
+        <itunes:owner>
+            <itunes:name>{{ podcast.itunes_author }}</itunes:name>
+            <itunes:email>{{ podcast.owner_email }}</itunes:email>
+        </itunes:owner>
+        <copyright>{{ podcast.copyright }}</copyright>
+
+        {% for episode in podcast.episodes.all %}
+        <item>
+            <title>{{ episode.title }}</title>
+            <enclosure length="{{ episode.length }}" type="{{ episode.content_type }}" url="{{ request.scheme }}://{{ request.META.HTTP_HOST }}{{ episode.audio_file.url }}"/>
+            <guid>{{ episode.guid }}</guid>
+            <pubDate>{{ episode.pub_date|date:"D, d M Y H:i:s +0300" }}</pubDate>
+            <description><![CDATA[{{ episode.description|safe }}]]></description>
+            <itunes:duration>{{ episode.itunes_duration }}</itunes:duration>
+            {% if episode.link %}<link>{{ episode.link }}</link>{% endif %}
+            <itunes:image href="{{ request.scheme }}://{{ request.META.HTTP_HOST }}{{ podcast.itunes_image.url }}"/>
+            <itunes:explicit>{% if episode.itunes_explicit %}yes{% else %}no{% endif %}</itunes:explicit>
+            <itunes:author>{{ podcast.itunes_author }}</itunes:author>
+
+        </item>
+        {% endfor %}
+    </channel>
+</rss>
