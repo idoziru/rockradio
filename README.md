@@ -7,6 +7,7 @@
 - Хостинг .mp3 на прямую через nginx
 - Быстрый переезд с https://podster.fm/. В том числе, перенос всех предыдущих выпусков на новый хостинг.
 - Собирает информацию о заходах краулеров iTunes и Google
+- Виртуальные rss
 ## Интерфейс
 Используется стандартная Django admin.
 ![](http://rockradio.dimafilatov.ru/uploads/for_readme/admin-ui.png)
@@ -24,6 +25,8 @@
 $ python manage.py downloadspodcast 2capitals https://podster.fm/rss.xml?pid=36066
 ```
 - 2capitals - это slug вашего подкаста на rockradio. Он используется для ссылки
+# Виртуальные rss
+Предположим, у вас есть всего два шаблона rss - itunes.rss и google.rss. itunes RSS - это самый популярный формат и требования к RSS подкастов. В проекте itunes.rss - это базовый RSS. Если человек обратится по адресу podcast-yandex.rss, то ему все равно откроется RSS feed, хотя такого шаблона yandex.rss нет. Вместо несуществующего шаблона, будет использован базовый itunes.rss, при этом, сбор статистики обращений краулеров все равно засчитает запрос к yandex.rss.
 # На чем работает
 - Ubuntu 16.04
 - Python 3.8 и выделенное окружение .pyenv
