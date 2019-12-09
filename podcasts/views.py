@@ -1,5 +1,7 @@
+import os
 from django.views.generic.detail import DetailView, TemplateResponseMixin
-
+from django.template.exceptions import TemplateDoesNotExist
+from django.conf import settings
 from podcasts.models import Podcast
 from statistic.models import Spider, Visit
 
@@ -28,7 +30,16 @@ class ITunesRSSView(DetailView, TemplateResponseMixin):
         return context
 
     def get_template_names(self):
-        return f"{self.kwargs['rss_type']}.rss"
+        all_templates = []
+        for template_dir in settings.TEMPLATES[0]["DIRS"]:
+            for dir, dirnames, filenames in os.walk(template_dir):
+                for filename in filenames:
+                    all_templates.append(os.path.join(dir, filename))
+        current_template = f"{self.kwargs['rss_type']}.rss"
+        if any(current_template in t for t in all_templates):
+            return f"{self.kwargs['rss_type']}.rss"
+        else:
+            return self.template_name
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
