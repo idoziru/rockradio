@@ -10,4 +10,3 @@ six==1.13.0
 soupsieve==1.9.5
 sqlparse==0.3.0
 uWSGI==2.0.18
-django-jet==1.0.8

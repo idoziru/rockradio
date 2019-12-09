@@ -19,7 +19,6 @@ from django.urls import path, include
 admin.site.site_header, admin.site.site_title = "Rock Radio", "Rock Radio"
 
 urlpatterns = [
-    path("jet/", include("jet.urls", "jet")),
     path("", admin.site.urls),
     path("podcasts/", include("podcasts.urls")),
 ]
