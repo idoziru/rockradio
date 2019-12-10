@@ -4,8 +4,8 @@ from statistic.models import Spider, Visit
 
 class VisitInline(admin.TabularInline):
     model = Visit
-    fields = ("rss", "date")
-    readonly_fields = ("rss", "date")
+    fields = ("remote_addrr", "remote_host", "rss", "date")
+    readonly_fields = ("remote_addrr", "remote_host", "rss", "date")
     can_delete = False
     show_change_link = True
 
@@ -15,15 +15,15 @@ class SpiderAdmin(admin.ModelAdmin):
     inlines = [
         VisitInline,
     ]
-    readonly_fields = ("name", "owner", "visits_counter")
-    list_display = ("name", "owner", "visits_counter")
-    orderring = ("owner",)
+    readonly_fields = ("name", "visits_counter")
+    list_display = ("name", "visits_counter")
+    orderring = ("visits_counter",)
 
 
 @admin.register(Visit)
 class VisitAdmin(admin.ModelAdmin):
-    list_display = ("spider", "rss", "date")
-    list_filter = ("spider", "date")
+    list_display = ("remote_addrr", "remote_host", "rss", "date")
+    list_filter = ("spider", "date", "rss")
     date_hierarchy = "date"
 
     def get_readonly_fields(self, request, obj=None):

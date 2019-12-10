@@ -18,6 +18,7 @@ class Podcast(models.Model):
     title = models.CharField(
         blank=False, max_length=255, help_text=("The show title"),
     )
+    # TODO Все HTML вставки нужно автоматически оборачивать в ![CDATA[ ]]
     description = models.TextField(
         blank=True, max_length=4000, help_text=("The show description"),
     )

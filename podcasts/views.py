@@ -51,9 +51,8 @@ class ITunesRSSView(DetailView, TemplateResponseMixin):
             remote_host=request.META.get("REMOTE_HOST", "None"),
         )
         spider = Spider.objects.get_or_create(
-            name=request.META.get("REMOTE_ADDR", "NOT FOUND")
+            name=self.kwargs["rss_type"] or "Unrecognized"
         )[0]
         visit.spider = spider
-        visit.save()
-        spider.save()
+        visit.save(), spider.save()
         return self.render_to_response(context)
