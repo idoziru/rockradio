@@ -3,7 +3,7 @@ from django.views.generic.detail import DetailView, TemplateResponseMixin
 from django.template.exceptions import TemplateDoesNotExist
 from django.conf import settings
 from podcasts.models import Podcast
-from statistic.models import Spider, Visit
+from statistic.models import Spider
 
 # IMPROVE Static rss feeds and do not always dynamically generate it.
 
@@ -44,15 +44,9 @@ class ITunesRSSView(DetailView, TemplateResponseMixin):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         context = self.get_context_data(object=self.object)
-        visit = Visit.objects.create(
-            rss=self.kwargs["rss_type"],
-            user_agent=request.META.get("USER_AGENT", "None"),
-            remote_addrr=request.META.get("REMOTE_ADDR", "None"),
-            remote_host=request.META.get("REMOTE_HOST", "None"),
-        )
         spider = Spider.objects.get_or_create(
             name=self.kwargs["rss_type"] or "Unrecognized"
         )[0]
-        visit.spider = spider
-        visit.save(), spider.save()
+        spider.visits_counter += 1
+        spider.save()
         return self.render_to_response(context)
