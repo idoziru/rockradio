@@ -5,9 +5,6 @@ from django.dispatch import receiver
 
 class Spider(models.Model):
     name = models.CharField(blank=False, unique=True, max_length=255)
-    owner = models.CharField(
-        blank=True, unique=False, max_length=255, default="STILL NOT FOUND"
-    )
     visits_counter = models.IntegerField(default=0)
 
     @property
@@ -67,14 +64,4 @@ class Visit(models.Model):
 
     class Meta:
         ordering = ["-date"]
-
-
-@receiver(models.signals.post_save, sender=Visit)
-def update_spider(sender, instance, created, **kwargs):
-    """
-    Each time we save visits we nned to update their
-    to re-calculate Spider owner.
-    """
-    if instance.spider:
-        instance.spider.save()
 
