@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from podcasts.models import Podcast, Episode
+from statistic.admin import ListeningInline
 
 
 class EpisodeInline(admin.TabularInline):
@@ -41,10 +42,25 @@ class PodcastAdmin(admin.ModelAdmin):
 
 @admin.register(Episode)
 class EpisodeAdmin(admin.ModelAdmin):
-    readonly_fields = ["guid", "length", "itunes_duration", "content_type"]
+    inlines = [
+        ListeningInline,
+    ]
+    readonly_fields = [
+        "guid",
+        "length",
+        "itunes_duration",
+        "content_type",
+        "count_listenings",
+    ]
     date_hierarchy = "pub_date"
-    list_display = ["podcast", "title", "pub_date", "itunes_duration"]
-    list_filter = ["pub_date", "podcast"]
+    list_display = [
+        "podcast",
+        "title",
+        "pub_date",
+        "itunes_duration",
+        "count_listenings",
+    ]
+    list_filter = ["podcast"]
     search_fields = ["title"]
     list_display_links = ["title"]
     save_on_top = True

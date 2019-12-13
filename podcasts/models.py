@@ -6,6 +6,7 @@ from django.db import models
 from django.conf import settings
 from django.dispatch import receiver
 from podcasts.utils import upload_podcast_files, upload_episode_files
+from statistic.models import Listening
 
 
 class Podcast(models.Model):
@@ -178,11 +179,24 @@ class Episode(models.Model):
         ),
     )
 
+    @staticmethod
+    def get_episode(audio_file):
+        episodes = Episode.objects.filter(audio_file__contains=audio_file)
+        if episodes:
+            return episodes[0]
+        return None
+
     @classmethod
     def get_itunes_duration(cls, episode) -> str:
         audio = MP3(episode.audio_file.path)
         seconds = int(audio.info.length)
         return str(timedelta(seconds=seconds))
+
+    @property
+    def count_listenings(self):
+        return len(
+            Listening.objects.filter(episode=self, length__gte=10000000)
+        )
 
     def __str__(self):
         return self.title

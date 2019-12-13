@@ -1,6 +1,4 @@
-from collections import Counter
 from django.db import models
-from django.dispatch import receiver
 
 
 class Spider(models.Model):
@@ -59,9 +57,27 @@ class Visit(models.Model):
     def __str__(self):
         if self.spider:
             return self.spider.name
-        else:
-            return self.remote_addrr
+        return self.remote_addrr
 
     class Meta:
-        ordering = ["-date"]
+        ordering = ["date"]
 
+
+class Listening(models.Model):
+    episode = models.ForeignKey(
+        "podcasts.Episode",
+        on_delete=models.CASCADE,
+        related_name="episodes",
+        blank=False,
+        null=False,
+    )
+    ip = models.CharField(blank=True, max_length=255)
+    pub_date = models.DateTimeField(blank=True,)
+    audio_file = models.FileField(blank=False)
+    length = models.BigIntegerField(blank=True, default=0)
+
+    def __str__(self):
+        return str(self.ip)
+
+    def __repr__(self):
+        return self.__str__()

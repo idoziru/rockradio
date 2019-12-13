@@ -1,6 +1,5 @@
 import os
 from django.views.generic.detail import DetailView, TemplateResponseMixin
-from django.template.exceptions import TemplateDoesNotExist
 from django.conf import settings
 from podcasts.models import Podcast
 from statistic.models import Spider, Visit, Requester
@@ -22,6 +21,10 @@ class ITunesRSSView(DetailView, TemplateResponseMixin):
     content_type = "application/xml"
     template_name = "itunes.rss"
 
+    def __init__(self):
+        self.object = self.get_object()
+        super().__init__()
+
     def get_context_object_name(self, obj):
         return "podcast"
 
@@ -32,17 +35,15 @@ class ITunesRSSView(DetailView, TemplateResponseMixin):
     def get_template_names(self):
         all_templates = []
         for template_dir in settings.TEMPLATES[0]["DIRS"]:
-            for dir, dirnames, filenames in os.walk(template_dir):
+            for _dir, _dirnames, filenames in os.walk(template_dir):
                 for filename in filenames:
-                    all_templates.append(os.path.join(dir, filename))
+                    all_templates.append(os.path.join(_dir, filename))
         current_template = f"{self.kwargs['rss_type']}.rss"
         if any(current_template in t for t in all_templates):
             return f"{self.kwargs['rss_type']}.rss"
-        else:
-            return self.template_name
+        return self.template_name
 
     def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
         context = self.get_context_data(object=self.object)
         rss = self.kwargs["rss_type"] or "Unrecognized"
         visit = Visit.objects.create(
@@ -57,5 +58,7 @@ class ITunesRSSView(DetailView, TemplateResponseMixin):
         )[0]
         requester.visits_counter += 1
         visit.spider = spider
-        visit.save(), spider.save(), requester.save()
+        visit.save()
+        spider.save()
+        requester.save()
         return self.render_to_response(context)

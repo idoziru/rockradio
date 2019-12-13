@@ -1,5 +1,5 @@
 from django.contrib import admin
-from statistic.models import Spider, Visit, Requester
+from statistic.models import Spider, Visit, Requester, Listening
 
 
 class VisitInline(admin.TabularInline):
@@ -8,6 +8,14 @@ class VisitInline(admin.TabularInline):
     readonly_fields = ("remote_addrr", "remote_host", "rss", "date")
     can_delete = False
     show_change_link = True
+
+
+class ListeningInline(admin.TabularInline):
+    model = Listening
+    fields = ("episode", "ip", "pub_date")
+    readonly_fields = ("episode", "ip", "pub_date")
+    can_delete = False
+    show_change_link = False
 
 
 @admin.register(Spider)
@@ -37,3 +45,22 @@ class RequesterAdmin(admin.ModelAdmin):
     list_display = ("name", "rss", "visits_counter")
     orderring = ("visits_counter",)
     list_filter = ("rss",)
+
+
+@admin.register(Listening)
+class ListeningAdmin(admin.ModelAdmin):
+
+    readonly_fields = (
+        "episode",
+        "ip",
+        "pub_date",
+    )
+    list_display = (
+        "episode",
+        "ip",
+        "pub_date",
+    )
+    orderring = ("pub_date",)
+    list_filter = ("pub_date",)
+    date_hierarchy = "pub_date"
+
