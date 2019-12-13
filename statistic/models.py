@@ -26,19 +26,16 @@ class Spider(models.Model):
         super(Spider, self).save(*args, **kwargs)
 
 
-@receiver(models.signals.post_save, sender=Spider)
-def change_owner(sender, instance, created, **kwargs):
-    """
-    After each new visit of a Spider count the most common rss
-    that current spider asks and by using this info make a new predition
-    for a Spider owner.
-    """
-    if Visit.objects.filter(spider=instance):
-        owner = Counter(
-            Spider.objects.filter(pk=instance.pk).values_list("visits__rss")
-        ).most_common(1)[0][0][0]
-        print(instance.visits)
-        Spider.objects.filter(pk=instance.pk).update(owner=owner)
+class Requester(models.Model):
+
+    name = models.CharField(blank=False, unique=False, max_length=255)
+    visits_counter = models.IntegerField(default=0)
+    rss = models.CharField(blank=False, max_length=255, default="Unrecognized")
+
+    def __str__(self):
+        return self.name
+
+    ordering = ["-visits_counter"]
 
 
 class Visit(models.Model):
@@ -46,6 +43,13 @@ class Visit(models.Model):
         Spider,
         on_delete=models.CASCADE,
         related_name="visits",
+        blank=True,
+        null=True,
+    )
+    requester = models.ForeignKey(
+        Requester,
+        on_delete=models.CASCADE,
+        related_name="requesters",
         blank=True,
         null=True,
     )

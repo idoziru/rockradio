@@ -1,5 +1,5 @@
 from django.contrib import admin
-from statistic.models import Spider, Visit
+from statistic.models import Spider, Visit, Requester
 
 
 class VisitInline(admin.TabularInline):
@@ -28,3 +28,12 @@ class VisitAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         return [f.name for f in self.model._meta.fields]
+
+
+@admin.register(Requester)
+class RequesterAdmin(admin.ModelAdmin):
+
+    readonly_fields = ("name", "rss", "visits_counter")
+    list_display = ("name", "rss", "visits_counter")
+    orderring = ("visits_counter",)
+    list_filter = ("rss",)
