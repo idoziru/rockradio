@@ -21,10 +21,6 @@ class ITunesRSSView(DetailView, TemplateResponseMixin):
     content_type = "application/xml"
     template_name = "itunes.rss"
 
-    def __init__(self):
-        self.object = self.get_object()
-        super().__init__()
-
     def get_context_object_name(self, obj):
         return "podcast"
 
@@ -44,6 +40,7 @@ class ITunesRSSView(DetailView, TemplateResponseMixin):
         return self.template_name
 
     def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
         context = self.get_context_data(object=self.object)
         rss = self.kwargs["rss_type"] or "Unrecognized"
         visit = Visit.objects.create(
