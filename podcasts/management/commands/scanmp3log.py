@@ -55,3 +55,6 @@ class Command(BaseCommand):
                         length = int(_length[0] if _length else 0)
                         listening.length += length
                         listening.save()
+
+        with open(options["path_to_log"], "w") as f:
+            f.write("")
