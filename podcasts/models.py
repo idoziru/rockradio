@@ -5,7 +5,7 @@ from mutagen.mp3 import MP3
 from django.db import models
 from django.conf import settings
 from django.dispatch import receiver
-from podcasts.utils import upload_podcast_file, upload_episode_files
+from podcasts.utils import upload_podcast_files, upload_episode_files
 from statistic.models import Listening
 
 
@@ -25,7 +25,7 @@ class Podcast(models.Model):
     # IMPROVE Make a checker for size and MBs
     itunes_image = models.FileField(
         blank=False,
-        upload_to=upload_podcast_file,
+        upload_to=upload_podcast_files,
         help_text=(
             "from 1400х1400 to 3000x3000 pixels, JPEG or PNG format, 72 dpi, "
             "not be larger than 512 KB."

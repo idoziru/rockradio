@@ -38,7 +38,7 @@ def get_podcast_folder(podcast) -> str:
     return podcast.slug
 
 
-def upload_podcast_file(podcast, filename: str) -> str:
+def upload_podcast_files(podcast, filename: str) -> str:
     filename = make_filename(filename)
     podcast_folder = get_podcast_folder(podcast)
     return os.path.join(podcast_folder, filename)
