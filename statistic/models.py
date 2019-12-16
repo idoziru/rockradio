@@ -75,6 +75,7 @@ class Listening(models.Model):
     pub_date = models.DateTimeField(blank=True,)
     audio_file = models.FileField(blank=False)
     length = models.BigIntegerField(blank=True, default=0)
+    user_agent = models.CharField(blank=True, max_length=3000, default="")
 
     def __str__(self):
         return str(self.ip)

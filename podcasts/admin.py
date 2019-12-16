@@ -10,10 +10,18 @@ class EpisodeInline(admin.TabularInline):
     fields = (
         "title",
         "pub_date",
+        "more_then_1_min",
+        "more_then_5_min",
+        "more_then_10_min",
+        "more_then_20_min",
     )
     readonly_fields = (
         "title",
         "pub_date",
+        "more_then_1_min",
+        "more_then_5_min",
+        "more_then_10_min",
+        "more_then_20_min",
     )
     show_change_link = True
 
@@ -50,7 +58,10 @@ class EpisodeAdmin(admin.ModelAdmin):
         "length",
         "itunes_duration",
         "content_type",
-        "count_listenings",
+        "more_then_1_min",
+        "more_then_5_min",
+        "more_then_10_min",
+        "more_then_20_min",
     ]
     date_hierarchy = "pub_date"
     list_display = [
@@ -58,7 +69,10 @@ class EpisodeAdmin(admin.ModelAdmin):
         "title",
         "pub_date",
         "itunes_duration",
-        "count_listenings",
+        "more_then_1_min",
+        "more_then_5_min",
+        "more_then_10_min",
+        "more_then_20_min",
     ]
     list_filter = ["podcast"]
     search_fields = ["title"]

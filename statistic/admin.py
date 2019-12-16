@@ -50,16 +50,8 @@ class RequesterAdmin(admin.ModelAdmin):
 @admin.register(Listening)
 class ListeningAdmin(admin.ModelAdmin):
 
-    readonly_fields = (
-        "episode",
-        "ip",
-        "pub_date",
-    )
-    list_display = (
-        "episode",
-        "ip",
-        "pub_date",
-    )
+    readonly_fields = ("episode", "ip", "pub_date", "length")
+    list_display = ("episode", "ip", "pub_date")
     orderring = ("pub_date",)
     list_filter = ("pub_date",)
     date_hierarchy = "pub_date"
