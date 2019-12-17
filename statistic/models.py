@@ -1,6 +1,4 @@
-from collections import Counter
 from django.db import models
-from django.dispatch import receiver
 
 
 class Spider(models.Model):
@@ -23,11 +21,30 @@ class Spider(models.Model):
         super(Spider, self).save(*args, **kwargs)
 
 
+class Requester(models.Model):
+
+    name = models.CharField(blank=False, unique=False, max_length=255)
+    visits_counter = models.IntegerField(default=0)
+    rss = models.CharField(blank=False, max_length=255, default="Unrecognized")
+
+    def __str__(self):
+        return self.name
+
+    ordering = ["-visits_counter"]
+
+
 class Visit(models.Model):
     spider = models.ForeignKey(
         Spider,
         on_delete=models.CASCADE,
         related_name="visits",
+        blank=True,
+        null=True,
+    )
+    requester = models.ForeignKey(
+        Requester,
+        on_delete=models.CASCADE,
+        related_name="requesters",
         blank=True,
         null=True,
     )
@@ -40,9 +57,28 @@ class Visit(models.Model):
     def __str__(self):
         if self.spider:
             return self.spider.name
-        else:
-            return self.remote_addrr
+        return self.remote_addrr
 
     class Meta:
-        ordering = ["-date"]
+        ordering = ["date"]
 
+
+class Listening(models.Model):
+    episode = models.ForeignKey(
+        "podcasts.Episode",
+        on_delete=models.CASCADE,
+        related_name="episodes",
+        blank=False,
+        null=False,
+    )
+    ip = models.CharField(blank=True, max_length=255)
+    pub_date = models.DateTimeField(blank=True,)
+    audio_file = models.FileField(blank=False)
+    length = models.BigIntegerField(blank=True, default=0)
+    user_agent = models.CharField(blank=True, max_length=3000, default="")
+
+    def __str__(self):
+        return str(self.ip)
+
+    def __repr__(self):
+        return self.__str__()

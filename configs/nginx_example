@@ -1,0 +1,33 @@
+log_format mp3      'dest_ip="$server_addr" '
+                    'src="$remote_addr" '
+                    'time_local="$time_local" '
+                    'bytes_out="$bytes_sent" '
+                    'http_referer="$http_referer"  '
+                    'http_user_agent="$http_user_agent" '
+                    'uri_path="$uri" '
+                    'request_time="$request_time" ';
+
+server {
+    listen 80;
+    server_name rockradio.dimafilatov.ru www.rockradio.dimafilatov.ru;
+    client_max_body_size 300M;
+    error_log /home/capitals/web/rockradio/logs/nginx_error.log;
+    location = /favicon.ico { access_log off; log_not_found off; }
+
+
+    location /static/ {
+        autoindex on;
+        root /home/capitals/web/rockradio/;
+    }
+
+    location /uploads/ {
+        autoindex on;
+        root /home/capitals/web/rockradio/;
+        access_log /home/capitals/web/rockradio/logs/mp3_access.log mp3;
+    }
+
+    location / {
+        include         uwsgi_params;
+        uwsgi_pass      unix:///home/capitals/web/rockradio/rockradio.sock;
+    }
+  }

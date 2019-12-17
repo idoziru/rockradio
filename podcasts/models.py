@@ -6,6 +6,7 @@ from django.db import models
 from django.conf import settings
 from django.dispatch import receiver
 from podcasts.utils import upload_podcast_files, upload_episode_files
+from statistic.models import Listening
 
 
 class Podcast(models.Model):
@@ -14,7 +15,6 @@ class Podcast(models.Model):
     https://help.apple.com/itc/podcasts_connect/#/itcb54353390
     """
 
-    # Required tags
     title = models.CharField(
         blank=False, max_length=255, help_text=("The show title"),
     )
@@ -54,7 +54,6 @@ class Podcast(models.Model):
         help_text=("The podcast parental advisory information."),
     )
 
-    # Recomended tags
     itunes_author = models.CharField(
         blank=False, max_length=255, help_text=("John Doe")
     )
@@ -71,7 +70,6 @@ class Podcast(models.Model):
         ),
     )
 
-    # Situational tags
     copyrights = models.CharField(
         blank=False,
         max_length=100,
@@ -87,7 +85,6 @@ class Podcast(models.Model):
         ),
     )
 
-    # Technical
     slug = models.CharField(max_length=255, unique=True)
     folder_name = models.CharField(max_length=255, blank=True)
 
@@ -100,7 +97,6 @@ class Episode(models.Model):
         Podcast, on_delete=models.PROTECT, related_name="episodes"
     )
 
-    # Required
     title = models.CharField(
         blank=False, max_length=255, help_text=("An episode title."),
     )
@@ -129,7 +125,6 @@ class Episode(models.Model):
         ),
     )
 
-    # Recommended tags
     guid = models.CharField(
         blank=True,
         max_length=255,
@@ -178,11 +173,78 @@ class Episode(models.Model):
         ),
     )
 
+    more_then_1_min = models.BigIntegerField(
+        default=0, help_text=("Listenings more then 1 min.")
+    )
+
+    more_then_5_min = models.BigIntegerField(
+        default=0, help_text=("Listenings more then 5 min.")
+    )
+
+    more_then_10_min = models.BigIntegerField(
+        default=0, help_text=("Listenings more then 10 min.")
+    )
+
+    more_then_20_min = models.BigIntegerField(
+        default=0, help_text=("Listenings more then 20 min.")
+    )
+
+    @staticmethod
+    def get_episode(audio_file):
+        episodes = Episode.objects.filter(audio_file__contains=audio_file)
+        if episodes:
+            return episodes[0]
+        return None
+
     @classmethod
-    def get_itunes_duration(cls, episode) -> str:
+    def get_duration(cls, episode) -> str:
         audio = MP3(episode.audio_file.path)
         seconds = int(audio.info.length)
         return str(timedelta(seconds=seconds))
+
+    def get_more_then_20_min(self) -> int:
+        """Return count of listenings of the current episode
+        if a listeting >= 20 minutues. 1 minut ~= 1000000 bytes.
+        """
+        minute = 1000000
+        return len(
+            Listening.objects.filter(episode=self, length__gte=minute * 20)
+        )
+
+    def get_more_then_10_min(self) -> int:
+        """Return count of listenings of the current episode
+        if a listeting >= 10 minutues. 1 minut ~= 1000000 bytes.
+        """
+        minute = 1000000
+        return len(
+            Listening.objects.filter(episode=self, length__gte=minute * 10)
+        )
+
+    def get_more_then_5_min(self) -> int:
+        """Return count of listenings of the current episode
+        if a listeting >= 5 minutues. 1 minut ~= 1000000 bytes.
+        """
+        minute = 1000000
+        return len(
+            Listening.objects.filter(episode=self, length__gte=minute * 5)
+        )
+
+    def get_more_then_1_min(self) -> int:
+        """Return count of listenings of the current episode
+        if a listeting >= 1 minutues. 1 minut ~= 1000000 bytes.
+        """
+        minute = 1000000
+        return len(
+            Listening.objects.filter(episode=self, length__gte=minute * 1)
+        )
+
+    def update_listenings_stat(self):
+        Episode.objects.filter(pk=self.pk).update(
+            more_then_1_min=self.get_more_then_1_min(),
+            more_then_5_min=self.get_more_then_5_min(),
+            more_then_10_min=self.get_more_then_10_min(),
+            more_then_20_min=self.get_more_then_20_min(),
+        )
 
     def __str__(self):
         return self.title
@@ -200,16 +262,16 @@ class Episode(models.Model):
         # all this exeptions need only for cases
         # when you download a new podcast from the old RSS feed
         # and you need manualy work with files via SFTP
-        except (Episode.DoesNotExist, FileNotFoundError) as e:
+        except (Episode.DoesNotExist, FileNotFoundError):
             pass
         super().save(*args, **kwargs)
         # IMPROVE Do only for new audio files
-        duration = Episode.get_itunes_duration(self)
+        duration = Episode.get_duration(self)
         Episode.objects.filter(pk=self.pk).update(itunes_duration=duration)
 
 
 @receiver(models.signals.pre_save, sender=Podcast)
-def delete_old_img(sender, instance, **kwargs):
+def delete_old_cover_file(sender, instance, **kwargs):
     try:
         old_img = Podcast.objects.get(pk=instance.pk).itunes_image
         new_img = instance.itunes_image
@@ -219,12 +281,12 @@ def delete_old_img(sender, instance, **kwargs):
     # all this exeptions need only for cases
     # when you download a new podcast from the old RSS feed
     # and you need manualy work with files via SFTP
-    except (Podcast.DoesNotExist, FileNotFoundError) as e:
+    except (Podcast.DoesNotExist, FileNotFoundError):
         pass
 
 
 @receiver(models.signals.post_save, sender=Podcast)
-def set_folder_name(sender, instance, **kwargs):
+def set_podcast_folder_name(sender, instance, **kwargs):
     if instance.folder_name == "":
         Podcast.objects.filter(pk=instance.pk).update(
             folder_name=instance.slug
@@ -252,7 +314,7 @@ def file_size(sender, instance, **kwargs) -> bool:
 
 
 @receiver(models.signals.post_save, sender=Episode)
-def set_guid(sender, instance, **kwargs):
+def set_unique_guid(sender, instance, **kwargs):
     """Uses episode.audiofile to set episode.guid and do it only once,
        because it is important for iTunes not to change guid"""
     if not instance.guid:
@@ -260,8 +322,7 @@ def set_guid(sender, instance, **kwargs):
 
 
 @receiver(models.signals.pre_delete, sender=Episode)
-def clear_episode_files(sender, instance, **kwargs):
-    """Delete audio_file after delete an episode"""
+def delete_episode_mp3(sender, instance, **kwargs):
     try:
         if instance.audio_file:
             instance.audio_file.delete(save=False)
