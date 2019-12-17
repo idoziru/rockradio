@@ -28,7 +28,14 @@ class ITunesRSSView(DetailView, TemplateResponseMixin):
         context = super().get_context_data(**kwargs)
         return context
 
-    def get_template_names(self):
+    def get_template_names(self) -> str:
+        """Checks requested rss type from a link. Return required template
+        if such exists or class template. For an example, you don't have template
+        for '[podcast-slug]-vk.rss', then will be used class template.
+
+        It is useful to have virtual templates when different platforms use
+        the same iTunes requirements and you want to separate there statistic.
+        """
         all_templates = []
         for template_dir in settings.TEMPLATES[0]["DIRS"]:
             for _dir, _dirnames, filenames in os.walk(template_dir):
