@@ -16,7 +16,10 @@ class Podcast(models.Model):
     """
 
     title = models.CharField(
-        blank=False, max_length=255, help_text=("The show title"),
+        blank=False,
+        max_length=255,
+        help_text=("The show title"),
+        verbose_name="Podcast title",
     )
     # TODO Все HTML вставки нужно автоматически оборачивать в ![CDATA[ ]]
     description = models.TextField(
@@ -98,7 +101,10 @@ class Episode(models.Model):
     )
 
     title = models.CharField(
-        blank=False, max_length=255, help_text=("An episode title."),
+        blank=False,
+        max_length=255,
+        help_text=("An episode title."),
+        verbose_name="Episode title",
     )
     audio_file = models.FileField(
         blank=False,
@@ -144,6 +150,7 @@ class Episode(models.Model):
         blank=False,
         auto_now=False,
         auto_now_add=False,
+        verbose_name="Episode pub date",
         help_text=(
             "The pub_date tag specifies the date and time "
             "when an episode was released. Format the content using "

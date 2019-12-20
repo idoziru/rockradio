@@ -1,3 +1,4 @@
+from rangefilter.filter import DateRangeFilter
 from django.contrib import admin
 from django.utils.html import format_html
 from podcasts.models import Podcast, Episode
@@ -74,7 +75,10 @@ class EpisodeAdmin(admin.ModelAdmin):
         "more_then_10_min",
         "more_then_20_min",
     ]
-    list_filter = ["podcast"]
+    list_filter = [
+        "podcast__title",
+        ("pub_date", DateRangeFilter),
+    ]
     search_fields = ["title"]
     list_display_links = ["title"]
     save_on_top = True

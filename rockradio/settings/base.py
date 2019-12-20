@@ -32,6 +32,7 @@ SECRET_KEY = config("SECRET_KEY")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
+    "rangefilter",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
