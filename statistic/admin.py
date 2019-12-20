@@ -1,3 +1,4 @@
+from rangefilter.filter import DateRangeFilter
 from django.contrib import admin
 from statistic.models import Spider, Visit, Requester, Listening
 
@@ -53,6 +54,10 @@ class ListeningAdmin(admin.ModelAdmin):
     readonly_fields = ("episode", "ip", "pub_date", "length")
     list_display = ("episode", "ip", "pub_date")
     orderring = ("pub_date",)
-    list_filter = ("pub_date",)
+    list_filter = (
+        ("pub_date", DateRangeFilter),
+        ("episode__pub_date", DateRangeFilter),
+        "episode__podcast__title",
+    )
     date_hierarchy = "pub_date"
 
