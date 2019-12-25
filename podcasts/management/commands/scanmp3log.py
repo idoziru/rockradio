@@ -11,7 +11,7 @@ IP_PATTERN = r"src=\"([\S]+)\""
 DATE_PATTERN = r"time_local=[\"]{1}([\S]+\s[\S]+)[\"]{1}"
 LENGHT_PATTERN = r"bytes_out=[\"]{1}([\S][\S]+)[\"]{1}"
 AUDIO_FILE_PATTERN = r"uri_path=[\"]{1}\S+\/([\d]+\.mp3)[\"]{1}"
-USER_AGENT_PATTER = r"http_user_agent=[\"]{1}([\s\S]+)[\"]{1}"
+USER_AGENT_PATTER = r"http_user_agent=[\"]{1}([\S\s]+)[\"]{1}[\s]{1}uri_path"
 
 
 def to_datetime(_str: str) -> datetime:
