@@ -3,7 +3,7 @@
      xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
 <channel>
         <title>{{ podcast.title }}</title>
-        <description>{{ podcast.description }}</description>
+        <description><![CDATA[{{ podcast.description|safe }}]]></description>
         <itunes:image href="{{ request.scheme }}://{{ request.META.HTTP_HOST }}{{ podcast.itunes_image.url }}"/>
         <language>{{ podcast.language }}</language>
         <itunes:category text="{{ podcast.itunes_category }}">
