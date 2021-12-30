@@ -16,12 +16,10 @@ server {
 
 
     location /static/ {
-        autoindex on;
         root /home/capitals/web/rockradio/;
     }
 
     location /uploads/ {
-        autoindex on;
         root /home/capitals/web/rockradio/;
         access_log /home/capitals/web/rockradio/logs/mp3_access.log mp3;
     }
